@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Надежда Комарицкая](https://up.htmlacademy.ru/ecmascript/12/user/644051).
-* Наставник: `Неизвестно`.
+* Наставник: `Кексобот`.
 
 ---
 
