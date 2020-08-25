@@ -1,11 +1,15 @@
+import {createElement} from "../utils.js";
+
 const createFilterMarkup = (filter, isActive) => {
   const {longName, shortName, count} = filter;
+  const countMarkup = shortName === `all` ? `` : `<span class="main-navigation__item-count">${count}</span>`;
+  const activeClass = isActive ? `main-navigation__item--active` : ``;
   return (
-    `<a href="#${shortName}" class="main-navigation__item ${isActive ? `main-navigation__item--active` : ``}">${longName} ${shortName === `all` ? `` : `<span class="main-navigation__item-count">${count}</span>`}</a>`
+    `<a href="#${shortName}" class="main-navigation__item ${activeClass}">${longName} ${countMarkup}</a>`
   );
 };
 
-export const createMainNavigationTemplate = (filters) => {
+const createMainNavigationTemplate = (filters) => {
   const filtersMarkup = filters.map((filter) => createFilterMarkup(filter)).join(`\n`);
   return (
     `<nav class="main-navigation">
@@ -16,3 +20,26 @@ export const createMainNavigationTemplate = (filters) => {
     </nav>`
   );
 };
+
+export default class MainNavigation {
+  constructor(filters) {
+    this._filters = filters;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMainNavigationTemplate(this._filters);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,8 +1,11 @@
 import * as moment from 'moment';
+import {createElement} from "../utils.js";
 
-export const createFilmCardTemplate = (film) => {
+const MAX_DESCRIPTION_LENGTH = 140;
+
+const createFilmCardTemplate = (film) => {
   const {name, poster, description, rating, release, duration, genres, commentsCount} = film;
-  const shortDescription = description.length > 140 ? `${description.slice(0, 139)}...` : description;
+  const shortDescription = description.length > MAX_DESCRIPTION_LENGTH ? `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1)}...` : description;
   const year = moment(release).format(`YYYY`);
   return (
     `<article class="film-card">
@@ -24,3 +27,26 @@ export const createFilmCardTemplate = (film) => {
     </article>`
   );
 };
+
+export default class FilmCard {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmCardTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
