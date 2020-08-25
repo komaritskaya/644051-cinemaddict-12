@@ -1,6 +1,7 @@
 import * as moment from 'moment';
+import {createElement} from "../utils.js";
 
-export const createCommentTemplate = (comment) => {
+const createCommentTemplate = (comment) => {
   const {user, emoji, date, text} = comment;
   const formattedDate = moment(date).format(`YYYY/MM/DD hh:mm`);
   return (
@@ -19,3 +20,26 @@ export const createCommentTemplate = (comment) => {
     </li>`
   );
 };
+
+export default class Comment {
+  constructor(comment) {
+    this._comment = comment;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCommentTemplate(this._comment);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
