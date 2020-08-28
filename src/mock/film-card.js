@@ -5,7 +5,7 @@ import {
   getRandomNumberWithDecimals,
   getRandomDate,
   getRandomText,
-} from '../utils';
+} from '../utils/common';
 
 const NAMES = [
   `The Dance of Life`,
