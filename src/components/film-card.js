@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component";
 
 const MAX_DESCRIPTION_LENGTH = 140;
 
@@ -28,25 +28,23 @@ const createFilmCardTemplate = (film) => {
   );
 };
 
-export default class FilmCard {
+export default class FilmCard extends AbstractComponent {
   constructor(film) {
+    super();
+
     this._film = film;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmCardTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setDetailsOpenersClickHandler(handler) {
+    const titleElement = this.getElement().querySelector(`.film-card__title`);
+    const posterElement = this.getElement().querySelector(`.film-card__poster`);
+    const commentsElement = this.getElement().querySelector(`.film-card__comments`);
+    [titleElement, posterElement, commentsElement].forEach((element) => {
+      element.addEventListener(`click`, handler);
+    });
   }
 }

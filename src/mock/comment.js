@@ -2,7 +2,7 @@ import {
   getSingleRandomItemFromArray,
   getRandomDate,
   getRandomSentence,
-} from '../utils';
+} from '../utils/common';
 
 const EMOJI = [
   `smile`,
