@@ -34,13 +34,17 @@ const createFilmCardTemplate = (film) => {
   const watchedButton = createControlsElementMarkup(ControlsElement.WATCHED, isWatched);
   const favoriteButton = createControlsElementMarkup(ControlsElement.FAVORITE, isFavorite);
 
+  const hoursString = duration.hours() ? `${duration.hours()}h ` : ``;
+  const minutesString = duration.minutes() ? `${duration.minutes()}m` : ``;
+  const durationString = `${hoursString}${minutesString}`;
+
   return (
     `<article class="film-card">
       <h3 class="film-card__title">${name}</h3>
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${year}</span>
-        <span class="film-card__duration">${duration}</span>
+        <span class="film-card__duration">${durationString}</span>
         <span class="film-card__genre">${genres[0]}</span>
       </p>
       <img src="./images/posters/${poster}" alt="" class="film-card__poster">

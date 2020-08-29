@@ -1,3 +1,4 @@
+import moment from 'moment';
 import {nanoid} from 'nanoid';
 import {generateComments} from './comment';
 import {
@@ -82,33 +83,36 @@ const ACTORS = [
 
 const AGE_LIMITS = [0, 6, 12, 16, 18];
 
-const generateDuration = () => {
-  const hours = getRandomInt(0, 3);
-  const minutes = hours ? getRandomInt(0, 59) : getRandomInt(10, 59);
-  const hoursString = hours ? `${hours}h ` : ``;
-  const minutesString = minutes ? `${minutes}m` : ``;
-  return `${hoursString}${minutesString}`;
+const generateDurationInMinutes = () => {
+  const minutes = moment.duration(getRandomInt(0, 180), `minutes`);
+  return minutes;
 };
 
-export const generateFilm = () => ({
-  id: nanoid(),
-  name: getSingleRandomItemFromArray(NAMES),
-  poster: getSingleRandomItemFromArray(POSTERS),
-  description: getRandomText(),
-  rating: getRandomNumberWithDecimals(0, 10, 1),
-  duration: generateDuration(),
-  genres: getMultipleRandomItemsFromArray(GENRES),
-  director: getSingleRandomItemFromArray(DIRECTORS),
-  writers: getMultipleRandomItemsFromArray(WRITERS),
-  actors: getMultipleRandomItemsFromArray(ACTORS),
-  ageLimit: getSingleRandomItemFromArray(AGE_LIMITS),
-  release: getRandomDate(new Date(1900, 1, 1), new Date()),
-  country: getSingleRandomItemFromArray(COUNTRIES),
-  comments: generateComments(getRandomInt(0, 20)),
-  isInWatchList: getRandomBool(),
-  isWatched: getRandomBool(),
-  isFavorite: getRandomBool(),
-});
+export const generateFilm = () => {
+  const isWatched = getRandomBool();
+  return ({
+    id: nanoid(),
+    name: getSingleRandomItemFromArray(NAMES),
+    poster: getSingleRandomItemFromArray(POSTERS),
+    description: getRandomText(),
+    rating: getRandomNumberWithDecimals(0, 10, 1),
+    // duration: generateDuration(),
+    duration: generateDurationInMinutes(),
+    genres: getMultipleRandomItemsFromArray(GENRES),
+    director: getSingleRandomItemFromArray(DIRECTORS),
+    writers: getMultipleRandomItemsFromArray(WRITERS),
+    actors: getMultipleRandomItemsFromArray(ACTORS),
+    ageLimit: getSingleRandomItemFromArray(AGE_LIMITS),
+    release: getRandomDate(new Date(1900, 1, 1), new Date()),
+    country: getSingleRandomItemFromArray(COUNTRIES),
+    // commentsCount: getRandomInt(0, 20),
+    comments: generateComments(getRandomInt(0, 20)),
+    isInWatchList: getRandomBool(),
+    isWatched,
+    watchDate: isWatched ? getRandomDate(new Date(2019, 1, 1), new Date()) : null,
+    isFavorite: getRandomBool(),
+  });
+};
 
 export const generateFilms = (count) => {
   return new Array(count)

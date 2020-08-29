@@ -9,27 +9,28 @@ const createFilterMarkup = (filter, isActive) => {
   );
 };
 
-const createMainNavigationTemplate = (filters) => {
+const createMainNavigationTemplate = (filters, mode) => {
   const filtersMarkup = filters.map((filter) => createFilterMarkup(filter, filter.checked)).join(`\n`);
   return (
     `<nav class="main-navigation">
       <div class="main-navigation__items">
         ${filtersMarkup}
       </div>
-      <a href="#stats" class="main-navigation__additional">Stats</a>
+      <a href="${mode === `page` ? `#stats` : `#`}" class="main-navigation__additional ${mode === `stats` ? `main-navigation__additional--active` : ``}">Stats</a>
     </nav>`
   );
 };
 
 export default class MainNavigation extends AbstractComponent {
-  constructor(filters) {
+  constructor(filters, mode) {
     super();
 
     this._filters = filters;
+    this._mode = mode;
   }
 
   getTemplate() {
-    return createMainNavigationTemplate(this._filters);
+    return createMainNavigationTemplate(this._filters, this._mode);
   }
 
   setFilterChangeHandler(handler) {
@@ -38,7 +39,9 @@ export default class MainNavigation extends AbstractComponent {
 
       if ((target.tagName !== `A` && target.tagName !== `SPAN`) ||
         target.classList.contains(`main-navigation__item--active`) ||
-        target.parentElement.classList.contains(`main-navigation__item--active`)) {
+        target.parentElement.classList.contains(`main-navigation__item--active`) ||
+        target.classList.contains(`main-navigation__additional`)
+      ) {
         return;
       }
 
@@ -51,6 +54,15 @@ export default class MainNavigation extends AbstractComponent {
 
       filterElement.classList.add(`main-navigation__item--active`);
       handler(filterName);
+    });
+  }
+
+  setStatsClickHandler(handler) {
+    const additionalElement = this.getElement().querySelector(`.main-navigation__additional`);
+    additionalElement.addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+
+      handler();
     });
   }
 }
