@@ -1,7 +1,44 @@
 import * as moment from 'moment';
-import AbstractComponent from "./abstract-component";
+import AbstractSmartComponent from "./abstract-smart-component";
+import {ControlsElement} from '../utils/controls';
 
-const createFilmDetailsTemplate = (film) => {
+const EMOJI = [
+  `smile`,
+  `sleeping`,
+  `puke`,
+  `angry`,
+];
+
+const createControlsElementMarkup = (element, isActive = false) => {
+  const activeAttribute = isActive ? `checked` : ``;
+  return (
+    `<input type="checkbox" class="film-details__control-input visually-hidden" id="${element.name}" name="${element.name}" ${activeAttribute}>
+    <label for="${element.name}" class="film-details__control-label film-details__control-label--${element.name}">${element.text}</label>`
+  );
+};
+
+const createEmojiMarkup = (emoji, currentEmoji) => {
+  return emoji
+    .map((item) => {
+      return (
+        `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${item}" value="${item} ${currentEmoji === item ? `checked` : ``}">
+        <label class="film-details__emoji-label" for="emoji-${item}">
+          <img src="./images/emoji/${item}.png" width="30" height="30" alt="emoji">
+        </label>`
+      );
+    })
+    .join(`\n`);
+};
+
+const createCurrentEmojiMarkup = (currentEmoji) => {
+  return (
+    `<div for="add-emoji" class="film-details__add-emoji-label">
+      ${currentEmoji ? `<img src="./images/emoji/${currentEmoji.trim()}.png" width="55" height="55"  alt="emoji">` : ``}
+    </div>`
+  );
+};
+
+const createFilmDetailsTemplate = (film, options = {}) => {
   const {
     name,
     poster,
@@ -17,6 +54,15 @@ const createFilmDetailsTemplate = (film) => {
     country,
     commentsCount,
   } = film;
+
+  const {
+    // userRating,
+    isInWatchList,
+    isWatched,
+    isFavorite,
+    currentEmoji,
+  } = options;
+
   const releaseDateString = moment(release).format(`DD MMMM YYYY`);
   const writersString = writers.join(`, `);
   const actorsString = actors.join(`, `);
@@ -24,6 +70,13 @@ const createFilmDetailsTemplate = (film) => {
   const genresMarkup = genres.map((genre) => (
     `<span class="film-details__genre">${genre}</span>`
   )).join(`\n`);
+  const emojiMarkup = createEmojiMarkup(EMOJI, currentEmoji);
+  const currentEmojiMarkup = createCurrentEmojiMarkup(currentEmoji);
+
+  const watchListInput = createControlsElementMarkup(ControlsElement.WATCHLIST, isInWatchList);
+  const watchedInput = createControlsElementMarkup(ControlsElement.WATCHED, isWatched);
+  const favoriteInput = createControlsElementMarkup(ControlsElement.FAVORITE, isFavorite);
+
   return (
     `<section class="film-details">
       <form class="film-details__inner" action="" method="get">
@@ -83,12 +136,9 @@ const createFilmDetailsTemplate = (film) => {
             </div>
           </div>
           <section class="film-details__controls">
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
-            <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
-            <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
-            <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
+            ${watchListInput}
+            ${watchedInput}
+            ${favoriteInput}
           </section>
         </div>
         <div class="form-details__bottom-container">
@@ -96,27 +146,12 @@ const createFilmDetailsTemplate = (film) => {
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsCount}</span></h3>
             <ul class="film-details__comments-list"></ul>
             <div class="film-details__new-comment">
-              <div for="add-emoji" class="film-details__add-emoji-label"></div>
+              ${currentEmojiMarkup}
               <label class="film-details__comment-label">
                 <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
               </label>
               <div class="film-details__emoji-list">
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-                <label class="film-details__emoji-label" for="emoji-smile">
-                  <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-                </label>
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-                <label class="film-details__emoji-label" for="emoji-sleeping">
-                  <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-                </label>
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-                <label class="film-details__emoji-label" for="emoji-puke">
-                  <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-                </label>
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-                <label class="film-details__emoji-label" for="emoji-angry">
-                  <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-                </label>
+                ${emojiMarkup}
               </div>
             </div>
           </section>
@@ -126,19 +161,85 @@ const createFilmDetailsTemplate = (film) => {
   );
 };
 
-export default class FilmDetails extends AbstractComponent {
+export default class FilmDetails extends AbstractSmartComponent {
   constructor(film) {
     super();
 
     this._film = film;
+    this._closeHandler = null;
+    this._currentEmoji = ``;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._film);
+    return createFilmDetailsTemplate(this._film, {
+      isInWatchList: this._isInWatchList,
+      isWatched: this._isWatched,
+      isFavorite: this._isFavorite,
+      currentEmoji: this._currentEmoji,
+    });
+  }
+
+  recoveryListeners() {
+    this.setCloseButtonClickHandler(this._closeHandler);
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  reset() {
+    const film = this._film;
+    this._isInWatchList = film.isInWatchList;
+    this._isWatched = film.isWatched;
+    this._isFavorite = film.isFavorite;
+    this._currentEmoji = ``;
+
+    this.rerender();
   }
 
   setCloseButtonClickHandler(handler) {
     const closeButtonElement = this.getElement().querySelector(`.film-details__close-btn`);
     closeButtonElement.addEventListener(`click`, handler);
+
+    this._closeHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.film-details__control-label--watchlist`)
+      .addEventListener(`click`, () => {
+        this._isInWatchList = !this._isInWatchList;
+        this.rerender();
+      });
+
+    element.querySelector(`.film-details__control-label--watched`)
+      .addEventListener(`click`, () => {
+        this._isWatched = !this._isWatched;
+        this.rerender();
+      });
+
+    element.querySelector(`.film-details__control-label--favorite`)
+      .addEventListener(`click`, () => {
+        this._isFavorite = !this._isFavorite;
+        this.rerender();
+      });
+
+    const emojiListElement = element.querySelector(`.film-details__emoji-list`);
+    emojiListElement.addEventListener(`click`, (evt) => {
+      if (evt.target.tagName !== `INPUT`) {
+        return;
+      }
+      if (this._currentEmoji === evt.target.value) {
+        this._currentEmoji = ``;
+      } else {
+        this._currentEmoji = evt.target.value;
+      }
+
+      this.rerender();
+    });
   }
 }
