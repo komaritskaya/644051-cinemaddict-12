@@ -5,6 +5,7 @@ import {
   getRandomNumberWithDecimals,
   getRandomDate,
   getRandomText,
+  getRandomBool,
 } from '../utils/common';
 
 const NAMES = [
@@ -101,6 +102,9 @@ export const generateFilm = () => ({
   release: getRandomDate(new Date(1900, 1, 1), new Date()),
   country: getSingleRandomItemFromArray(COUNTRIES),
   commentsCount: getRandomInt(0, 20),
+  isInWatchList: getRandomBool(),
+  isWatched: getRandomBool(),
+  isFavorite: getRandomBool(),
 });
 
 export const generateFilms = (count) => {
