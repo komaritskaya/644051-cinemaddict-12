@@ -1,10 +1,9 @@
 import UserInfoComponent from './components/user-info';
 import MainNavigationComponent from './components/main-navigation';
-import SortComponent from './components/sort';
 import FilmsSectionComponent from './components/films-section';
 import FilmsCountComponent from './components/films-count';
-import {render} from "./utils/render";
-import PageController from "./controllers/page.js";
+import {render} from './utils/render';
+import PageController from './controllers/page';
 import {generateFilms} from './mock/film-card';
 import {generateFilters} from './mock/filter';
 
@@ -19,7 +18,6 @@ const mainElement = bodyElement.querySelector(`.main`);
 
 render(headerElement, new UserInfoComponent());
 render(mainElement, new MainNavigationComponent(filters));
-render(mainElement, new SortComponent());
 
 const filmsSectionComponent = new FilmsSectionComponent();
 render(mainElement, filmsSectionComponent);
