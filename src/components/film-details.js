@@ -1,6 +1,11 @@
 import moment from 'moment';
+import he from 'he';
+import {nanoid} from 'nanoid';
+import {render} from '../utils/render';
+import Comment from './comment';
 import AbstractSmartComponent from "./abstract-smart-component";
 import {ControlsElement} from '../utils/controls';
+import {KeyCode} from '../utils/common';
 
 const EMOJI = [
   `smile`,
@@ -38,6 +43,14 @@ const createCurrentEmojiMarkup = (currentEmoji) => {
   );
 };
 
+const parseFormData = (formData) => {
+  return {
+    isInWatchList: formData.get(ControlsElement.WATCHLIST.name) === `on`,
+    isWatched: formData.get(ControlsElement.WATCHED.name) === `on`,
+    isFavorite: formData.get(ControlsElement.FAVORITE.name) === `on`,
+  };
+};
+
 const createFilmDetailsTemplate = (film, options = {}) => {
   const {
     name,
@@ -52,15 +65,14 @@ const createFilmDetailsTemplate = (film, options = {}) => {
     actors,
     ageLimit,
     country,
-    commentsCount,
   } = film;
 
   const {
-    // userRating,
     isInWatchList,
     isWatched,
     isFavorite,
     currentEmoji,
+    comments,
   } = options;
 
   const releaseDateString = moment(release).format(`DD MMMM YYYY`);
@@ -143,8 +155,8 @@ const createFilmDetailsTemplate = (film, options = {}) => {
         </div>
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">
-            <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsCount}</span></h3>
-            <ul class="film-details__comments-list"></ul>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+          <ul class="film-details__comments-list"></ul>
             <div class="film-details__new-comment">
               ${currentEmojiMarkup}
               <label class="film-details__comment-label">
@@ -166,9 +178,15 @@ export default class FilmDetails extends AbstractSmartComponent {
     super();
 
     this._film = film;
+    this._isInWatchList = film.isInWatchList;
+    this._isWatched = film.isWatched;
+    this._isFavorite = film.isFavorite;
+    this._comments = film.comments;
     this._closeHandler = null;
     this._currentEmoji = ``;
+    this._newComment = ``;
 
+    this._renderComments();
     this._subscribeOnEvents();
   }
 
@@ -177,7 +195,17 @@ export default class FilmDetails extends AbstractSmartComponent {
       isInWatchList: this._isInWatchList,
       isWatched: this._isWatched,
       isFavorite: this._isFavorite,
+      comments: this._comments,
       currentEmoji: this._currentEmoji,
+    });
+  }
+
+  getFormData() {
+    const form = this.getElement().querySelector(`.film-details__inner`);
+    const formData = new FormData(form);
+
+    return Object.assign({}, parseFormData(formData), {
+      comments: this._comments,
     });
   }
 
@@ -188,6 +216,8 @@ export default class FilmDetails extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+    this.getElement().scrollTop = this._elementScrollTop;
+    this._renderComments();
   }
 
   reset() {
@@ -196,6 +226,7 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._isWatched = film.isWatched;
     this._isFavorite = film.isFavorite;
     this._currentEmoji = ``;
+    this._newComment = ``;
 
     this.rerender();
   }
@@ -207,39 +238,91 @@ export default class FilmDetails extends AbstractSmartComponent {
     this._closeHandler = handler;
   }
 
+  _renderComments() {
+    const commentsListElement = this.getElement().querySelector(`.film-details__comments-list`);
+    this._comments.slice(0, this._comments.length)
+      .forEach((comment) => render(commentsListElement, new Comment(comment)));
+  }
+
   _subscribeOnEvents() {
     const element = this.getElement();
 
     element.querySelector(`.film-details__control-label--watchlist`)
       .addEventListener(`click`, () => {
+        this._elementScrollTop = this.getElement().scrollTop;
         this._isInWatchList = !this._isInWatchList;
         this.rerender();
       });
 
     element.querySelector(`.film-details__control-label--watched`)
       .addEventListener(`click`, () => {
+        this._elementScrollTop = this.getElement().scrollTop;
         this._isWatched = !this._isWatched;
         this.rerender();
       });
 
     element.querySelector(`.film-details__control-label--favorite`)
       .addEventListener(`click`, () => {
+        this._elementScrollTop = this.getElement().scrollTop;
         this._isFavorite = !this._isFavorite;
         this.rerender();
       });
 
     const emojiListElement = element.querySelector(`.film-details__emoji-list`);
     emojiListElement.addEventListener(`click`, (evt) => {
+      this._elementScrollTop = this.getElement().scrollTop;
       if (evt.target.tagName !== `INPUT`) {
         return;
       }
       if (this._currentEmoji === evt.target.value) {
         this._currentEmoji = ``;
       } else {
-        this._currentEmoji = evt.target.value;
+        this._currentEmoji = evt.target.value.trim();
       }
 
       this.rerender();
+    });
+
+    const commentsListElement = element.querySelector(`.film-details__comments-list`);
+    commentsListElement.addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      this._elementScrollTop = this.getElement().scrollTop;
+      if (evt.target.tagName !== `BUTTON`) {
+        return;
+      }
+
+      const commentElement = evt.target.closest(`.film-details__comment`);
+      const commentId = commentElement.dataset.commentId;
+
+      const index = this._comments.findIndex((it) => it.id === commentId);
+      this._comments = [].concat(this._comments.slice(0, index), this._comments.slice(index + 1));
+
+      this.rerender();
+    });
+
+    element.querySelector(`.film-details__comment-input`).addEventListener(`input`, (evt) => {
+      this._newComment = evt.target.value;
+    });
+
+    element.addEventListener(`keydown`, (evt) => {
+      if (evt.ctrlKey && evt.keyCode === KeyCode.ENTER_KEY) {
+        if (this._currentEmoji && this._newComment) {
+          this._elementScrollTop = this.getElement().scrollTop;
+
+          const newComment = {
+            id: nanoid(),
+            text: he.encode(this._newComment),
+            emoji: this._currentEmoji,
+            user: `You`,
+            date: new Date(),
+          };
+
+          this._comments.push(newComment);
+          this._currentEmoji = ``;
+          this._newComment = ``;
+          this.rerender();
+        }
+      }
     });
   }
 }
