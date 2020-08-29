@@ -2,10 +2,10 @@ import moment from 'moment';
 import AbstractComponent from "./abstract-component";
 
 const createCommentTemplate = (comment) => {
-  const {user, emoji, date, text} = comment;
+  const {id, user, emoji, date, text} = comment;
   const formattedDate = moment(date).format(`YYYY/MM/DD hh:mm`);
   return (
-    `<li class="film-details__comment">
+    `<li class="film-details__comment" data-comment-id="${id}">
       <span class="film-details__comment-emoji">
         <img src="./images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}">
       </span>

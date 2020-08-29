@@ -1,3 +1,4 @@
+import {nanoid} from 'nanoid';
 import {
   getSingleRandomItemFromArray,
   getRandomDate,
@@ -22,6 +23,7 @@ const USERS = [
 ];
 
 export const generateComment = () => ({
+  id: nanoid(),
   user: getSingleRandomItemFromArray(USERS),
   emoji: getSingleRandomItemFromArray(EMOJI),
   date: getRandomDate(new Date(2019, 1, 1), new Date()),

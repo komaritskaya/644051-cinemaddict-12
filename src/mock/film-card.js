@@ -1,3 +1,5 @@
+import {nanoid} from 'nanoid';
+import {generateComments} from './comment';
 import {
   getSingleRandomItemFromArray,
   getMultipleRandomItemsFromArray,
@@ -89,6 +91,7 @@ const generateDuration = () => {
 };
 
 export const generateFilm = () => ({
+  id: nanoid(),
   name: getSingleRandomItemFromArray(NAMES),
   poster: getSingleRandomItemFromArray(POSTERS),
   description: getRandomText(),
@@ -101,7 +104,7 @@ export const generateFilm = () => ({
   ageLimit: getSingleRandomItemFromArray(AGE_LIMITS),
   release: getRandomDate(new Date(1900, 1, 1), new Date()),
   country: getSingleRandomItemFromArray(COUNTRIES),
-  commentsCount: getRandomInt(0, 20),
+  comments: generateComments(getRandomInt(0, 20)),
   isInWatchList: getRandomBool(),
   isWatched: getRandomBool(),
   isFavorite: getRandomBool(),

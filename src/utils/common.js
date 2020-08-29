@@ -2,6 +2,7 @@ const LOREM_TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cra
 
 export const KeyCode = {
   ESC_KEY: 27,
+  ENTER_KEY: 13,
 };
 
 export const getRandomInt = (min, max) => {

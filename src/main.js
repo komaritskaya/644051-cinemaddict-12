@@ -1,28 +1,31 @@
 import UserInfoComponent from './components/user-info';
-import MainNavigationComponent from './components/main-navigation';
+import FilterController from "./controllers/filter.js";
 import FilmsSectionComponent from './components/films-section';
 import FilmsCountComponent from './components/films-count';
+import FilmsModel from './models/movies';
 import {render} from './utils/render';
 import PageController from './controllers/page';
 import {generateFilms} from './mock/film-card';
-import {generateFilters} from './mock/filter';
 
 const ALL_FILMS_COUNT = 23;
 
 const allFilms = generateFilms(ALL_FILMS_COUNT);
-const filters = generateFilters();
+const filmsModel = new FilmsModel();
+filmsModel.setFilms(allFilms);
 
 const bodyElement = document.querySelector(`body`);
 const headerElement = bodyElement.querySelector(`.header`);
 const mainElement = bodyElement.querySelector(`.main`);
 
 render(headerElement, new UserInfoComponent());
-render(mainElement, new MainNavigationComponent(filters));
+
+const filterController = new FilterController(mainElement, filmsModel);
+filterController.render();
 
 const filmsSectionComponent = new FilmsSectionComponent();
 render(mainElement, filmsSectionComponent);
 
-const pageController = new PageController(filmsSectionComponent);
+const pageController = new PageController(filmsSectionComponent, filmsModel);
 pageController.render(allFilms);
 
 const footerStatisticsElement = document.querySelector(`.footer__statistics`);
