@@ -103,6 +103,7 @@ export default class MovieController {
       evt.preventDefault();
       this._onDataChange(film, Object.assign({}, film, {
         isWatched: !film.isWatched,
+        watchDate: !film.isWatched ? new Date() : null,
       }));
     });
 

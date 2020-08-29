@@ -72,6 +72,16 @@ export default class PageController {
     this._filmsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
+  hide() {
+    this._container.hide();
+    this._sortComponent.hide();
+  }
+
+  show() {
+    this._container.show();
+    this._sortComponent.show();
+  }
+
   render() {
     const allFilmsListElement = this._allFilmsContainerComponent.getElement();
 

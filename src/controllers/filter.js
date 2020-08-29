@@ -4,20 +4,27 @@ import {render, replace} from "../utils/render.js";
 import {getFilmsByFilter} from "../utils/filter.js";
 
 export default class FilterController {
-  constructor(container, filmsModel) {
+  constructor(container, filmsModel, pageController, statsComponent) {
     this._container = container;
     this._filmsModel = filmsModel;
+    this._mode = `page`;
+
+    this._pageController = pageController;
+    // this._sortComponent = sortComponent;
+    this._statsComponent = statsComponent;
 
     this._activeFilterType = FilterType.ALL.shortName;
     this._filterComponent = null;
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
+    // this.setStatsClickHandler = this.setStatsClickHandler.bind(this);
 
     this._filmsModel.setDataChangeHandler(this._onDataChange);
+    // this._subscribeOnEvents();
   }
 
-  render() {
+  render(mode) {
     const container = this._container;
     const allFilms = this._filmsModel.getFilmsAll();
     const filters = Object.values(FilterType).map((filterType) => {
@@ -29,14 +36,20 @@ export default class FilterController {
     });
     const oldComponent = this._filterComponent;
 
-    this._filterComponent = new FilterComponent(filters);
+    this._filterComponent = new FilterComponent(filters, mode);
     this._filterComponent.setFilterChangeHandler(this._onFilterChange);
+
+    if (this._statsClickHandler) {
+      this._filterComponent.setStatsClickHandler(this._statsClickHandler);
+    }
 
     if (oldComponent) {
       replace(this._filterComponent, oldComponent);
     } else {
       render(container, this._filterComponent);
     }
+
+    this._subscribeOnEvents();
   }
 
   _onFilterChange(filterType) {
@@ -46,5 +59,24 @@ export default class FilterController {
 
   _onDataChange() {
     this.render();
+  }
+
+  _subscribeOnEvents() {
+    this._filterComponent.setStatsClickHandler(() => {
+
+      switch (this._mode) {
+        case `page`:
+          this._pageController.hide();
+          this._statsComponent.show();
+          this._mode = `stats`;
+          break;
+        case `stats`:
+          this._pageController.show();
+          this._statsComponent.hide();
+          this._mode = `page`;
+          break;
+      }
+      this.render(this._mode);
+    });
   }
 }
