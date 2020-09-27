@@ -4,6 +4,9 @@ import MovieModel from './../models/movie.js';
 import {render, replace, remove} from "../utils/render.js";
 import {KeyCode} from '../utils/common';
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
+
 const Mode = {
   DEFAULT: `default`,
   DETAILS: `details`,
@@ -71,7 +74,13 @@ export default class MovieController {
   }
 
   shake() {
+    this._movieCardComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._movieDetailsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
 
+    setTimeout(() => {
+      this._movieCardComponent.getElement().style.animation = ``;
+      this._movieDetailsComponent.getElement().style.animation = ``;
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   _openDetails(movie) {
