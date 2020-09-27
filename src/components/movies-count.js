@@ -1,10 +1,10 @@
 import AbstractComponent from "./abstract-component";
 
-const createFilmsCountTemplate = (count) => (
+const createMoviesCountTemplate = (count) => (
   `<p>${count} movies inside</p>`
 );
 
-export default class FilmsCount extends AbstractComponent {
+export default class MoviesCount extends AbstractComponent {
   constructor(count) {
     super();
 
@@ -12,6 +12,6 @@ export default class FilmsCount extends AbstractComponent {
   }
 
   getTemplate() {
-    return createFilmsCountTemplate(this._count);
+    return createMoviesCountTemplate(this._count);
   }
 }

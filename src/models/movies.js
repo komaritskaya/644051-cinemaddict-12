@@ -1,4 +1,4 @@
-import {getMoviesByFilter, FilterType} from "../utils/filter.js";
+import {getMoviesByFilter, FilterType} from '../utils/filter';
 
 export default class Movies {
   constructor() {
@@ -51,5 +51,23 @@ export default class Movies {
 
   _callHandlers(handlers) {
     handlers.forEach((handler) => handler());
+  }
+
+  removeComment(commentId, movie) {
+    const index = movie.comments.findIndex((it) => it.id === commentId);
+
+    if (index === -1) {
+      return false;
+    }
+
+    movie.comments = [...movie.comments.slice(0, index), ...movie.comments.slice(index + 1)];
+
+    return this.updateMovie(movie.id, movie);
+  }
+
+  addComment(comment, movie) {
+    movie.comments = [...movie.comments, comment];
+
+    return this.updateMovie(movie.id, movie);
   }
 }

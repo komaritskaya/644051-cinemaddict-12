@@ -1,13 +1,13 @@
 import AbstractComponent from "./abstract-component";
 
-const createExtraFilmsContainerTemplate = (listTitle) => (
+const createExtraMoviesContainerTemplate = (listTitle) => (
   `<section class="films-list--extra">
     <h2 class="films-list__title">${listTitle}</h2>
     <div class="films-list__container"></div>
   </section>`
 );
 
-export default class ExtraFilmsContainer extends AbstractComponent {
+export default class ExtraMoviesContainer extends AbstractComponent {
   constructor(listTitle) {
     super();
 
@@ -15,6 +15,6 @@ export default class ExtraFilmsContainer extends AbstractComponent {
   }
 
   getTemplate() {
-    return createExtraFilmsContainerTemplate(this._listTitle);
+    return createExtraMoviesContainerTemplate(this._listTitle);
   }
 }

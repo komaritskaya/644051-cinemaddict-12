@@ -1,11 +1,11 @@
-import {createElement} from "../utils/render";
+import {createElement} from '../utils/render';
 
 const HIDDEN_CLASS = `visually-hidden`;
 
 export default class AbstractComponent {
   constructor() {
     if (new.target === AbstractComponent) {
-      throw new Error(`Can't instantiate AbstractComponent, only concrete one.`);
+      throw new Error(`Can't instantiate AbstractComponent, only exact one.`);
     }
 
     this._element = null;

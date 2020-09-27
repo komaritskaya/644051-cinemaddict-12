@@ -1,43 +1,53 @@
 import UserInfoComponent from './components/user-info';
 import FilterController from "./controllers/filter.js";
-import FilmsSectionComponent from './components/films-section';
-import FilmsCountComponent from './components/films-count';
+import MoviesSectionComponent from './components/movies-section';
+import MoviesCountComponent from './components/movies-count';
 import StatisticsComponent from "./components/statistics.js";
-import FilmsModel from './models/movies';
+import MoviesModel from './models/movies';
 import {render} from './utils/render';
 import PageController from './controllers/page';
-import {generateFilms} from './mock/film-card';
+import API from './api.js';
 
-const ALL_FILMS_COUNT = 23;
+const AUTHORIZATION = `Basic 12345`;
+const END_POINT = `https://12.ecmascript.pages.academy/cinemaddict`;
 
-const allFilms = generateFilms(ALL_FILMS_COUNT);
-const watchedFilms = allFilms.filter(({isWatched}) => isWatched);
-const filmsModel = new FilmsModel();
-filmsModel.setFilms(allFilms);
+const api = new API(END_POINT, AUTHORIZATION);
 
-const bodyElement = document.querySelector(`body`);
-const headerElement = bodyElement.querySelector(`.header`);
-const mainElement = bodyElement.querySelector(`.main`);
+const moviesModel = new MoviesModel();
 
-render(headerElement, new UserInfoComponent(watchedFilms.length));
+api.getMovies()
+  .then((movies) => {
+    moviesModel.setMovies(movies);
 
-const filmsSectionComponent = new FilmsSectionComponent();
-const pageController = new PageController(filmsSectionComponent, filmsModel);
-const statisticsComponent = new StatisticsComponent(watchedFilms);
-const filterController = new FilterController(mainElement, filmsModel, pageController, statisticsComponent);
-filterController.render();
+    const watchedMovies = moviesModel.getMoviesAll().filter(({isWatched}) => isWatched);
 
-render(mainElement, statisticsComponent);
-statisticsComponent.hide();
+    const bodyElement = document.querySelector(`body`);
+    const headerElement = bodyElement.querySelector(`.header`);
+    const mainElement = bodyElement.querySelector(`.main`);
 
-render(mainElement, filmsSectionComponent);
+    render(headerElement, new UserInfoComponent(watchedMovies.length));
 
-pageController.render(allFilms);
+    const moviesSectionComponent = new MoviesSectionComponent();
 
-const footerStatisticsElement = document.querySelector(`.footer__statistics`);
-render(footerStatisticsElement, new FilmsCountComponent(ALL_FILMS_COUNT));
+    const pageController = new PageController(moviesSectionComponent, moviesModel, api);
+    const statisticsComponent = new StatisticsComponent(watchedMovies);
+    const filterController = new FilterController(mainElement, moviesModel, pageController, statisticsComponent);
+    filterController.render();
 
-// filterController.setStatsClickHandler(() => {
-//   pageController.hide();
-//   statisticsComponent.show();
-// });
+    render(mainElement, statisticsComponent);
+    statisticsComponent.hide();
+
+    render(mainElement, moviesSectionComponent);
+
+    pageController.render();
+
+    const footerStatisticsElement = document.querySelector(`.footer__statistics`);
+    render(footerStatisticsElement, new MoviesCountComponent(moviesModel.getMoviesAll().length));
+
+
+    // filterController.setStatsClickHandler(() => {
+    //   pageController.hide();
+    //   statisticsComponent.show();
+    // });
+
+  });
