@@ -1,7 +1,7 @@
 import AbstractComponent from "./abstract-component";
 
 const createMoviesCountTemplate = (count) => (
-  `<p>${count} movies inside</p>`
+  `<p>${count || `No`} movies inside</p>`
 );
 
 export default class MoviesCount extends AbstractComponent {
