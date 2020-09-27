@@ -17,28 +17,28 @@ export const FilterType = {
   },
 };
 
-export const getFilmsInWatchList = (films) => {
-  return films.filter((film) => film.isInWatchList);
+export const getMoviesInWatchList = (movies) => {
+  return movies.filter((movie) => movie.isInWatchList);
 };
 
-export const getWatchedFilms = (films) => {
-  return films.filter((film) => film.isWatched);
+export const getWatchedMovies = (movies) => {
+  return movies.filter((movie) => movie.isWatched);
 };
 
-export const getFavoriteFilms = (films) => {
-  return films.filter((film) => film.isFavorite);
+export const getFavoriteMovies = (movies) => {
+  return movies.filter((movie) => movie.isFavorite);
 };
 
-export const getFilmsByFilter = (films, filterType) => {
+export const getMoviesByFilter = (movies, filterType) => {
   switch (filterType) {
     case FilterType.ALL.shortName:
-      return films;
+      return movies;
     case FilterType.WATCHLIST.shortName:
-      return getFilmsInWatchList(films);
+      return getMoviesInWatchList(movies);
     case FilterType.HISTORY.shortName:
-      return getWatchedFilms(films);
+      return getWatchedMovies(movies);
     case FilterType.FAVORITES.shortName:
-      return getFavoriteFilms(films);
+      return getFavoriteMovies(movies);
   }
-  return films;
+  return movies;
 };

@@ -22,8 +22,8 @@ const getInitialDateByPeriod = (period) => {
   }
 };
 
-const getGenres = (films) => {
-  return films.reduce((acc, {genres}) => {
+const getGenres = (movies) => {
+  return movies.reduce((acc, {genres}) => {
     [...genres].forEach((it) => {
       if (!acc.includes(it)) {
         acc.push(it);
@@ -33,17 +33,17 @@ const getGenres = (films) => {
   }, []);
 };
 
-const getFilmsByGenre = (genre, films) => {
-  const filteredFilms = films.filter((film) => film.genres.includes(genre));
-  return filteredFilms.length;
+const getMoviesByGenre = (genre, movies) => {
+  const filteredMovies = movies.filter((movie) => movie.genres.includes(genre));
+  return filteredMovies.length;
 };
 
-const getTopGenre = (films) => {
-  return getGenres(films).reduce((acc, genre) => getFilmsByGenre(genre, films) > getFilmsByGenre(acc, films) ? genre : acc);
+const getTopGenre = (movies) => {
+  return getGenres(movies).reduce((acc, genre) => getMoviesByGenre(genre, movies) > getMoviesByGenre(acc, movies) ? genre : acc);
 };
 
-const getTotalRuntime = (films) => {
-  return films.reduce((acc, {duration}) => acc.add(duration), moment.duration(0, `minutes`));
+const getTotalRuntime = (movies) => {
+  return movies.reduce((acc, {duration}) => acc.add(duration), moment.duration(0, `minutes`));
 };
 
 const createPeriodsMarkup = (currentPeriod) => {
@@ -56,17 +56,17 @@ const createPeriodsMarkup = (currentPeriod) => {
   }).join(`\n`);
 };
 
-const getFilmsByPeriod = (films, period) => {
+const getMoviesByPeriod = (movies, period) => {
   const initialDate = getInitialDateByPeriod(period);
   if (initialDate) {
-    return films.filter((film) => moment(film.watchDate).isSameOrAfter(initialDate));
+    return movies.filter((movie) => moment(movie.watchDate).isSameOrAfter(initialDate));
   } else {
-    return films;
+    return movies;
   }
 };
 
-const renderChart = (ctx, films) => {
-  const genres = getGenres(films);
+const renderChart = (ctx, movies) => {
+  const genres = getGenres(movies);
   ctx.height = BAR_HEIGHT * genres.length;
 
   const myChart = new Chart(ctx, {
@@ -75,7 +75,7 @@ const renderChart = (ctx, films) => {
     data: {
       labels: genres,
       datasets: [{
-        data: genres.map((genre) => getFilmsByGenre(genre, films)),
+        data: genres.map((genre) => getMoviesByGenre(genre, movies)),
         backgroundColor: `#ffe800`,
         hoverBackgroundColor: `#ffe800`,
         anchor: `start`,
@@ -129,23 +129,23 @@ const renderChart = (ctx, films) => {
   return myChart;
 };
 
-const createStatisticsTemplate = (totalFilms, films, period) => {
+const createStatisticsTemplate = (totalMovies, movies, period) => {
 
-  const userRank = getUserRank(totalFilms.length);
+  const userRank = getUserRank(totalMovies.length);
   const periodsMarkup = createPeriodsMarkup(period);
 
-  let filmsDataMarkup;
-  if (!films.length) {
-    filmsDataMarkup = `<p>No movies watched during this period</p>`;
+  let moviesDataMarkup;
+  if (!movies.length) {
+    moviesDataMarkup = `<p>No movies watched during this period</p>`;
   } else {
-    const totalHours = Math.floor(getTotalRuntime(films).asHours());
-    const totalMinutes = getTotalRuntime(films).minutes();
-    const topGenre = getTopGenre(films);
-    filmsDataMarkup = (
+    const totalHours = Math.floor(getTotalRuntime(movies).asHours());
+    const totalMinutes = getTotalRuntime(movies).minutes();
+    const topGenre = getTopGenre(movies);
+    moviesDataMarkup = (
       `<ul class="statistic__text-list">
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">You watched</h4>
-          <p class="statistic__item-text">${films.length} <span class="statistic__item-description">movies</span></p>
+          <p class="statistic__item-text">${movies.length} <span class="statistic__item-description">movies</span></p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Total duration</h4>
@@ -170,7 +170,7 @@ const createStatisticsTemplate = (totalFilms, films, period) => {
         <p class="statistic__filters-description">Show stats:</p>
         ${periodsMarkup}
       </form>
-      ${filmsDataMarkup}
+      ${moviesDataMarkup}
       <div class="statistic__chart-wrap">
         <canvas class="statistic__chart" width="1000"></canvas>
       </div>
@@ -179,11 +179,11 @@ const createStatisticsTemplate = (totalFilms, films, period) => {
 };
 
 export default class Statistics extends AbstractSmartComponent {
-  constructor(films) {
+  constructor(movies) {
     super();
 
-    this._films = films;
-    this._shownFilms = films;
+    this._movies = movies;
+    this._shownMovies = movies;
     this._period = `all-time`;
 
 
@@ -194,7 +194,7 @@ export default class Statistics extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._films, this._shownFilms, this._period);
+    return createStatisticsTemplate(this._movies, this._shownMovies, this._period);
   }
 
   show() {
@@ -219,14 +219,14 @@ export default class Statistics extends AbstractSmartComponent {
 
   _renderChart() {
     const statisticsCtx = this.getElement().querySelector(`.statistic__chart`);
-    const films = this._shownFilms;
+    const movies = this._shownMovies;
 
-    this._chart = renderChart(statisticsCtx, films);
+    this._chart = renderChart(statisticsCtx, movies);
   }
 
   // _resetCharts() {
-  //   this._films = films;
-  //   this._shownFilms = films;
+  //   this._movies = movies;
+  //   this._shownMovies = movies;
   //   this._period = `all-time`;
 
 
@@ -239,7 +239,7 @@ export default class Statistics extends AbstractSmartComponent {
       .addEventListener(`change`, (evt) => {
         evt.preventDefault();
         this._period = evt.target.value;
-        this._shownFilms = getFilmsByPeriod(this._films, evt.target.value);
+        this._shownMovies = getMoviesByPeriod(this._movies, evt.target.value);
         this.rerender();
       });
   }

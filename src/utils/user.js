@@ -1,9 +1,9 @@
-export const getUserRank = (watchedFilmsCount) => {
-  if (!watchedFilmsCount) {
+export const getUserRank = (watchedMoviesCount) => {
+  if (!watchedMoviesCount) {
     return ``;
-  } else if (watchedFilmsCount <= 10) {
+  } else if (watchedMoviesCount <= 10) {
     return `Novice`;
-  } else if (watchedFilmsCount > 10 && watchedFilmsCount <= 20) {
+  } else if (watchedMoviesCount > 10 && watchedMoviesCount <= 20) {
     return `Fan`;
   } else {
     return `Movie Buff`;

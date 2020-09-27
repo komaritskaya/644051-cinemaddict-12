@@ -1,5 +1,6 @@
-import FilmCardComponent from "../components/film-card.js";
-import FilmDetailsComponent from "../components/film-details.js";
+import MovieCardComponent from "../components/movie-card.js";
+import MovieDetailsComponent from "../components/movie-details.js";
+import MovieModel from './../models/movie.js';
 import {render, replace, remove} from "../utils/render.js";
 import {KeyCode} from '../utils/common';
 
@@ -9,38 +10,51 @@ const Mode = {
 };
 
 export default class MovieController {
-  constructor(container, onDataChange, onViewChange) {
-    this._film = null;
+  constructor(
+      container,
+      onDataChange,
+      onViewChange,
+      onCommentDelete,
+      onCommentAdd
+  ) {
+    this.id = null;
 
     this._container = container;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._onCommentDelete = onCommentDelete;
+    this._onCommentAdd = onCommentAdd;
 
     this._mode = Mode.DEFAULT;
 
-    this._filmCardComponent = null;
-    this._filmDetailsComponent = null;
+    this._movieCardComponent = null;
+    this._movieDetailsComponent = null;
 
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._closeDetails = this._closeDetails.bind(this);
+    this._openDetails = this._openDetails.bind(this);
+
+    this._onCommentFormSubmit = this._onCommentFormSubmit.bind(this);
   }
 
-  render(film) {
-    this._film = film;
+  render(movie) {
+    this.id = movie.id;
 
-    const oldFilmCardComponent = this._movieCardComponent;
-    const oldFilmDetailsComponent = this._movieDetailsComponent;
+    const oldMovieCardComponent = this._movieCardComponent;
+    const oldMovieDetailsComponent = this._movieDetailsComponent;
 
-    this._filmCardComponent = new FilmCardComponent(film);
-    this._filmDetailsComponent = new FilmDetailsComponent(film);
+    this._movieCardComponent = new MovieCardComponent(movie);
+    this._movieDetailsComponent = new MovieDetailsComponent(movie);
 
-    if (oldFilmCardComponent && oldFilmDetailsComponent) {
-      replace(this._filmCardComponent, oldFilmCardComponent);
-      replace(this._filmDetailsComponent, oldFilmDetailsComponent);
+    if (oldMovieCardComponent && oldMovieDetailsComponent) {
+      replace(this._movieCardComponent, oldMovieCardComponent);
+      replace(this._movieDetailsComponent, oldMovieDetailsComponent);
+      this._subscribeOnPopupEvents(movie);
     } else {
-      render(this._container, this._filmCardComponent);
+      render(this._container, this._movieCardComponent);
     }
 
-    this._subscribeOnCardEvents(film);
+    this._subscribeOnCardEvents(movie);
   }
 
   setDefaultView() {
@@ -50,23 +64,34 @@ export default class MovieController {
   }
 
   destroy() {
-    remove(this._filmCardComponent);
-    remove(this._filmDetailsComponent);
+    remove(this._movieCardComponent);
+    remove(this._movieDetailsComponent);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+    document.removeEventListener(`keydown`, this._onCommentFormSubmit);
   }
 
-  _openDetails() {
+  shake() {
+
+  }
+
+  _openDetails(movie) {
     this._onViewChange();
 
     const bodyElement = document.querySelector(`body`);
-    render(bodyElement, this._filmDetailsComponent);
+    render(bodyElement, this._movieDetailsComponent);
+
+    this._subscribeOnPopupEvents(movie);
+    document.addEventListener(`keydown`, this._onEscKeyDown);
+    document.addEventListener(`keydown`, this._onCommentFormSubmit);
     this._mode = Mode.DETAILS;
   }
 
   _closeDetails() {
-    this._filmDetailsComponent.reset();
+    // this._movieDetailsComponent.reset();
 
-    remove(this._filmDetailsComponent);
+    remove(this._movieDetailsComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+    document.removeEventListener(`keydown`, this._onCommentFormSubmit);
     this._mode = Mode.DEFAULT;
   }
 
@@ -74,53 +99,105 @@ export default class MovieController {
     const isEscKey = evt.keyCode === KeyCode.ESC_KEY;
 
     if (isEscKey) {
-      // remove(this._filmDetailsComponent);
-      this._applyFormData(this._film);
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
+      this._closeDetails();
+      // remove(this._movieDetailsComponent);
+      // this._applyFormData(this._movie);
+      // document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
   }
 
-  _applyFormData(film) {
-    const data = this._filmDetailsComponent.getFormData();
-    this._onDataChange(film, Object.assign({}, film, data));
-  }
+  // _applyFormData(movie) {
+  //   const data = this._movieDetailsComponent.getFormData();
+  //   this._onDataChange(movie, Object.assign({}, movie, data));
+  // }
 
-  _subscribeOnCardEvents(film) {
-    this._filmCardComponent.setDetailsOpenersClickHandler(() => {
-      this._openDetails();
-      this._subscribeOnPopupEvents(film);
-      document.addEventListener(`keydown`, this._onEscKeyDown);
+  _subscribeOnCardEvents(movie) {
+    this._movieCardComponent.setDetailsOpenersClickHandler(() => {
+      this._openDetails(movie);
     });
 
-    this._filmCardComponent.setWatchListButtonClickHandler((evt) => {
+    this._movieCardComponent.setWatchListButtonClickHandler((evt) => {
       evt.preventDefault();
-      this._onDataChange(film, Object.assign({}, film, {
-        isInWatchList: !film.isInWatchList,
-      }));
+      this._onWatchlistChange(movie);
     });
 
-    this._filmCardComponent.setWatchedButtonClickHandler((evt) => {
+    this._movieCardComponent.setWatchedButtonClickHandler((evt) => {
       evt.preventDefault();
-      this._onDataChange(film, Object.assign({}, film, {
-        isWatched: !film.isWatched,
-        watchDate: !film.isWatched ? new Date() : null,
-      }));
+      this._onAlreadyWatchedChange(movie);
     });
 
-    this._filmCardComponent.setFavoriteButtonClickHandler((evt) => {
+    this._movieCardComponent.setFavoriteButtonClickHandler((evt) => {
       evt.preventDefault();
-      this._onDataChange(film, Object.assign({}, film, {
-        isFavorite: !film.isFavorite,
-      }));
+      this._onFavoritesChange(movie);
     });
   }
 
-  _subscribeOnPopupEvents(film) {
-    this._filmDetailsComponent.setCloseButtonClickHandler((evt) => {
+  _subscribeOnPopupEvents(movie) {
+    this._movieDetailsComponent.setCloseButtonClickHandler((evt) => {
       evt.preventDefault();
-      this._applyFormData(film);
-
-      document.removeEventListener(`keydown`, this._onEscKeyDown());
+      // this._applyFormData(movie);
+      this._closeDetails();
+      // document.removeEventListener(`keydown`, this._onEscKeyDown());
     });
+
+    this._movieDetailsComponent.setAddToWatchlistClickHandler(() => {
+      this._onWatchlistChange(movie);
+    });
+
+    this._movieDetailsComponent.setAlreadyWatchedClickHandler(() => {
+      this._onAlreadyWatchedChange(movie);
+    });
+
+    this._movieDetailsComponent.setAddToFavoritesClickHandler(() => {
+      this._onFavoritesChange(movie);
+    });
+
+    this._movieDetailsComponent.setCommentDeleteButtonClickHandler((commentId, button) => {
+      this._onCommentDelete({movie, commentId, button});
+    });
+
+    this._movieDetailsComponent.setEmojiClickHandler();
+  }
+
+  _onWatchlistChange(movie) {
+    const newMovie = MovieModel.clone(movie);
+    newMovie.isInWatchList = !newMovie.isInWatchList;
+    this._onDataChange(movie, newMovie);
+  }
+
+  _onAlreadyWatchedChange(movie) {
+    const newMovie = MovieModel.clone(movie);
+    newMovie.isWatched = !newMovie.isWatched;
+    newMovie.watchDate = newMovie.watchDate ? new Date() : null;
+
+    this._onDataChange(movie, newMovie);
+  }
+
+  _onFavoritesChange(movie) {
+    const newMovie = MovieModel.clone(movie);
+    newMovie.isFavorite = !movie.isFavorite;
+
+    this._onDataChange(movie, newMovie);
+  }
+
+  _onCommentFormSubmit(evt) {
+    if (evt.ctrlKey && evt.keyCode === KeyCode.ENTER_KEY) {
+      const {formElements, comment, movie} = this._movieDetailsComponent.getData();
+
+      if (Object.values(comment).some((prop) => !prop)) {
+        return;
+      }
+
+      formElements.forEach((element) => {
+        element.disabled = true;
+
+        if (element.tagName === `TEXTAREA`) {
+          element.style.boxShadow = null;
+        }
+      });
+
+      document.removeEventListener(`keydown`, this._onCommentFormSubmit);
+      this._onCommentAdd({comment, movie, onCommentFormSubmit: this._onCommentFormSubmit});
+    }
   }
 }
