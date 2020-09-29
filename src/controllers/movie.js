@@ -1,11 +1,10 @@
-import MovieCardComponent from "../components/movie-card.js";
-import MovieDetailsComponent from "../components/movie-details.js";
-import MovieModel from './../models/movie.js';
-import {render, replace, remove} from "../utils/render.js";
+import MovieCardComponent from '../components/movie-card';
+import MovieDetailsComponent from '../components/movie-details';
+import MovieModel from './../models/movie';
+import {render, replace, remove} from '../utils/render';
 import {KeyCode} from '../utils/common';
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
-
 
 const Mode = {
   DEFAULT: `default`,
@@ -96,8 +95,6 @@ export default class MovieController {
   }
 
   _closeDetails() {
-    // this._movieDetailsComponent.reset();
-
     remove(this._movieDetailsComponent);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     document.removeEventListener(`keydown`, this._onCommentFormSubmit);
@@ -109,16 +106,8 @@ export default class MovieController {
 
     if (isEscKey) {
       this._closeDetails();
-      // remove(this._movieDetailsComponent);
-      // this._applyFormData(this._movie);
-      // document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
   }
-
-  // _applyFormData(movie) {
-  //   const data = this._movieDetailsComponent.getFormData();
-  //   this._onDataChange(movie, Object.assign({}, movie, data));
-  // }
 
   _subscribeOnCardEvents(movie) {
     this._movieCardComponent.setDetailsOpenersClickHandler(() => {
@@ -144,9 +133,7 @@ export default class MovieController {
   _subscribeOnPopupEvents(movie) {
     this._movieDetailsComponent.setCloseButtonClickHandler((evt) => {
       evt.preventDefault();
-      // this._applyFormData(movie);
       this._closeDetails();
-      // document.removeEventListener(`keydown`, this._onEscKeyDown());
     });
 
     this._movieDetailsComponent.setAddToWatchlistClickHandler(() => {
@@ -199,10 +186,6 @@ export default class MovieController {
 
       formElements.forEach((element) => {
         element.disabled = true;
-
-        if (element.tagName === `TEXTAREA`) {
-          element.style.boxShadow = null;
-        }
       });
 
       document.removeEventListener(`keydown`, this._onCommentFormSubmit);

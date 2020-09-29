@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-component";
+import AbstractComponent from './abstract-component';
 import {getUserRank} from '../utils/user';
 
 const createUserInfoTemplate = (watchedMoviesCount) => (

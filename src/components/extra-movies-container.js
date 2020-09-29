@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-component";
+import AbstractComponent from './abstract-component';
 
 const createExtraMoviesContainerTemplate = (listTitle) => (
   `<section class="films-list--extra">

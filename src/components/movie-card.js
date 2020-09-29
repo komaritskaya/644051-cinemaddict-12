@@ -1,5 +1,5 @@
 import moment from 'moment';
-import AbstractComponent from "./abstract-component";
+import AbstractComponent from './abstract-component';
 import {ControlsElement} from '../utils/controls';
 
 const MAX_DESCRIPTION_LENGTH = 140;

@@ -1,6 +1,6 @@
-import moment from "moment";
-import AbstractSmartComponent from "./abstract-smart-component.js";
-import Chart from "chart.js";
+import moment from 'moment';
+import Chart from 'chart.js';
+import AbstractSmartComponent from './abstract-smart-component';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getUserRank} from '../utils/user';
 
