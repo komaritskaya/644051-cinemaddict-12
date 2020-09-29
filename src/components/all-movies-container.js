@@ -1,9 +1,6 @@
 import AbstractComponent from "./abstract-component";
 
-// const NUMBER_TYPE = `number`;
-
 const createTitleMarkup = (moviesCount) => {
-  // let headlineMarkup = ``;
   if (typeof moviesCount === `number`) {
     return moviesCount ? `<h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>` : ``;
   } else {
@@ -11,15 +8,17 @@ const createTitleMarkup = (moviesCount) => {
   }
 };
 
-const createContainerMarkup = (moviesCount) => moviesCount ? `<div class="films-list__container">\n</div>` : ``;
+const createContainerMarkup = (moviesCount) => moviesCount ? `<div class="films-list__container"></div>` : ``;
 
 const createAllMoviesContainerTemplate = (moviesCount) => {
   const titleMarkup = createTitleMarkup(moviesCount);
   const moviesListContainerMarkup = createContainerMarkup(moviesCount);
   return (
-    `<section class="films-list">
-      ${titleMarkup}
-      ${moviesListContainerMarkup}
+    `<section class="films">
+      <section class="films-list">
+        ${titleMarkup}
+        ${moviesListContainerMarkup}
+      </section>
     </section>`
   );
 };
@@ -29,6 +28,7 @@ export default class AllMoviesContainer extends AbstractComponent {
     super();
 
     this._moviesCount = moviesCount;
+    // this.isLoading = true;
   }
 
   getTemplate() {
@@ -37,8 +37,9 @@ export default class AllMoviesContainer extends AbstractComponent {
 
   onMoviesLoad(moviesCount) {
     const titleMarkup = createTitleMarkup(moviesCount);
-    const movieListContainerMarkup = createContainerMarkup(moviesCount);
+    const moviesListContainerMarkup = createContainerMarkup(moviesCount);
 
-    this.getElement().firstElementChild.innerHTML = `${titleMarkup}${movieListContainerMarkup}`;
+    this.getElement().querySelector(`.films-list`).innerHTML = `${titleMarkup}${moviesListContainerMarkup}`;
+    // this.isLoading = false;
   }
 }

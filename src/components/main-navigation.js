@@ -45,6 +45,10 @@ export default class MainNavigation extends AbstractComponent {
         return;
       }
 
+      if (this.getElement().querySelector(`.main-navigation__additional--active`)) {
+        this.getElement().querySelector(`.main-navigation__additional--active`).classList.remove(`main-navigation__additional--active`);
+      }
+
       if (this.getElement().querySelector(`.main-navigation__item--active`)) {
         this.getElement().querySelector(`.main-navigation__item--active`).classList.remove(`main-navigation__item--active`);
       }
@@ -61,7 +65,7 @@ export default class MainNavigation extends AbstractComponent {
     const additionalElement = this.getElement().querySelector(`.main-navigation__additional`);
     additionalElement.addEventListener(`click`, (evt) => {
       evt.preventDefault();
-
+      additionalElement.classList.add(`main-navigation__additional--active`);
       handler();
     });
   }

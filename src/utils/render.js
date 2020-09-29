@@ -31,13 +31,13 @@ export const remove = (component) => {
 };
 
 export const replace = (newComponent, oldComponent) => {
-  const parentElement = oldComponent.getElement().parentElement;
   const newElement = newComponent.getElement();
   const oldElement = oldComponent.getElement();
+  const parentElement = oldElement.parentElement;
 
-  const isExistElements = !!(parentElement && newElement && oldElement);
+  const shouldElementsExist = !!(parentElement && newElement && oldElement);
 
-  if (isExistElements && parentElement.contains(oldElement)) {
+  if (shouldElementsExist && parentElement.contains(oldElement)) {
     parentElement.replaceChild(newElement, oldElement);
   }
 };
