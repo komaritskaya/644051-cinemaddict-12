@@ -190,7 +190,6 @@ export default class Statistics extends AbstractSmartComponent {
     this._chart = null;
     this._renderChart();
     this._subscribeOnEvents();
-
   }
 
   getTemplate() {
@@ -223,16 +222,6 @@ export default class Statistics extends AbstractSmartComponent {
 
     this._chart = renderChart(statisticsCtx, movies);
   }
-
-  // _resetCharts() {
-  //   this._movies = movies;
-  //   this._shownMovies = movies;
-  //   this._period = `all-time`;
-
-
-  //   this._chart = null;
-  //   this.rerender();
-  // }
 
   _subscribeOnEvents() {
     this.getElement().querySelector(`.statistic__filters`)
