@@ -1,6 +1,6 @@
 import moment from 'moment';
 import he from 'he';
-import AbstractSmartComponent from "./abstract-smart-component";
+import AbstractSmartComponent from './abstract-smart-component';
 import {ControlsElement} from '../utils/controls';
 
 const EMOJI = [
@@ -64,7 +64,7 @@ const parseFormData = (formData) => {
   return {
     comment: he.encode(formData.get(`comment`)),
     date: new Date().toISOString(),
-    emotion: formData.get(`comment-emoji`)
+    emotion: formData.get(`comment-emoji`).trim(),
   };
 };
 
@@ -272,73 +272,10 @@ export default class MovieDetails extends AbstractSmartComponent {
   getData() {
     const form = this.getElement().querySelector(`.film-details__inner`);
     const formData = new FormData(form);
-    // console.log(parseFormData(formData));
     return {
       formElements: form.querySelectorAll(`input, textarea, button`),
       comment: parseFormData(formData),
       movie: this._movie
     };
   }
-
-  // _subscribeOnEvents() {
-  //   const element = this.getElement();
-
-
-  //   const emojiListElement = element.querySelector(`.film-details__emoji-list`);
-  //   emojiListElement.addEventListener(`click`, (evt) => {
-  //     this._elementScrollTop = this.getElement().scrollTop;
-  //     if (evt.target.tagName !== `INPUT`) {
-  //       return;
-  //     }
-  //     if (this._currentEmoji === evt.target.value) {
-  //       this._currentEmoji = ``;
-  //     } else {
-  //       this._currentEmoji = evt.target.value.trim();
-  //     }
-
-  //     this.rerender();
-  //   });
-
-  //   const commentsListElement = element.querySelector(`.film-details__comments-list`);
-  //   commentsListElement.addEventListener(`click`, (evt) => {
-  //     evt.preventDefault();
-  //     this._elementScrollTop = this.getElement().scrollTop;
-  //     if (evt.target.tagName !== `BUTTON`) {
-  //       return;
-  //     }
-
-  //     const commentElement = evt.target.closest(`.film-details__comment`);
-  //     const commentId = commentElement.dataset.commentId;
-
-  //     const index = this._comments.findIndex((it) => it.id === commentId);
-  //     this._comments = [].concat(this._comments.slice(0, index), this._comments.slice(index + 1));
-
-  //     this.rerender();
-  //   });
-
-  //   element.querySelector(`.film-details__comment-input`).addEventListener(`input`, (evt) => {
-  //     this._newComment = evt.target.value;
-  //   });
-
-  //   element.addEventListener(`keydown`, (evt) => {
-  //     if (evt.ctrlKey && evt.keyCode === KeyCode.ENTER_KEY) {
-  //       if (this._currentEmoji && this._newComment) {
-  //         this._elementScrollTop = this.getElement().scrollTop;
-
-  //         const newComment = {
-  //           id: nanoid(),
-  //           comment: he.encode(this._newComment),
-  //           emotion: this._currentEmoji,
-  //           author: `You`,
-  //           date: new Date(),
-  //         };
-
-  //         this._comments.push(newComment);
-  //         this._currentEmoji = ``;
-  //         this._newComment = ``;
-  //         this.rerender();
-  //       }
-  //     }
-  //   });
-  // }
 }

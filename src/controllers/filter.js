@@ -1,7 +1,7 @@
-import FilterComponent from "../components/main-navigation.js";
-import {FilterType} from "../utils/filter.js";
-import {render, replace} from "../utils/render.js";
-import {getMoviesByFilter} from "../utils/filter.js";
+import FilterComponent from '../components/main-navigation';
+import {FilterType} from '../utils/filter';
+import {render, replace} from '../utils/render';
+import {getMoviesByFilter} from '../utils/filter';
 
 export default class FilterController {
   constructor(container, moviesModel, statsClickHandler, statsBlurHandler) {

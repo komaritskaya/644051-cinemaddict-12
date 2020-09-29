@@ -27,7 +27,6 @@ export default class Movie {
     return {
       "id": this.id,
       "comments": clone ? this.comments : this.comments.map(({id}) => id),
-      // "comments": [],
       "film_info": {
         "title": this.name,
         "alternative_title": this.alternativeName,

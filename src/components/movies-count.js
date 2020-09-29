@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-component";
+import AbstractComponent from './abstract-component';
 
 const createMoviesCountTemplate = (count) => (
   `<p>${count || `0`} movies inside</p>`

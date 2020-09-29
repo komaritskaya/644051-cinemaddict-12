@@ -98,8 +98,6 @@ export default class PageController {
     this._sortedMovies = movies;
 
     const moviesListElement = container.querySelector(`.films-list`);
-    // console.log(container);
-    // console.log(moviesListElement);
 
     if (!movies.length) {
       render(moviesListElement, this._noMoviesComponent);
@@ -198,10 +196,9 @@ export default class PageController {
 
   _onCommentAdd(newData) {
     const {movie: newMovie, comment, onCommentFormSubmit} = newData;
-    this._api.addComment(newMovie.id, comment)
+    this._api.addComment(newMovie, comment)
         .then((movie) => {
           const isSuccess = this._moviesModel.addComment(movie.comments.pop(), movie);
-
           if (isSuccess) {
             this._showedMovieControllers
             // .concat(this._extraMovieControllers)
@@ -215,10 +212,6 @@ export default class PageController {
         .catch(() => {
           document.querySelectorAll(`[disabled]`).forEach((element) => {
             element.disabled = false;
-
-            if (element.tagName === `TEXTAREA`) {
-              element.style.boxShadow = `0 0 0 3px red`;
-            }
           });
 
           this._showedMovieControllers
@@ -263,7 +256,6 @@ export default class PageController {
 
   _onFilterChange() {
     this._updateMovies();
-    // this._onSortTypeChange(SortType.DEFAULT);
   }
 
   _onShowMoreButtonClick() {

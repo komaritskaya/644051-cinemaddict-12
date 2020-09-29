@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-component";
+import AbstractComponent from './abstract-component';
 
 const createTitleMarkup = (moviesCount) => {
   if (typeof moviesCount === `number`) {
@@ -28,7 +28,6 @@ export default class AllMoviesContainer extends AbstractComponent {
     super();
 
     this._moviesCount = moviesCount;
-    // this.isLoading = true;
   }
 
   getTemplate() {
@@ -40,6 +39,5 @@ export default class AllMoviesContainer extends AbstractComponent {
     const moviesListContainerMarkup = createContainerMarkup(moviesCount);
 
     this.getElement().querySelector(`.films-list`).innerHTML = `${titleMarkup}${moviesListContainerMarkup}`;
-    // this.isLoading = false;
   }
 }
