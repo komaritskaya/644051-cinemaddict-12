@@ -1,13 +1,13 @@
 import FilterComponent from '../components/main-navigation';
-import {FilterType} from '../utils/filter';
+import {FilterType, getMoviesByFilter} from '../utils/filter';
 import {render, replace} from '../utils/render';
-import {getMoviesByFilter} from '../utils/filter';
+import {PageMode} from '../utils/page';
 
 export default class FilterController {
   constructor(container, moviesModel, statsClickHandler, statsBlurHandler) {
     this._container = container;
     this._moviesModel = moviesModel;
-    this._mode = `page`;
+    this._mode = PageMode.PAGE;
 
     this._statsClickHandler = statsClickHandler;
     this._statsBlurHandler = statsBlurHandler;
@@ -39,7 +39,7 @@ export default class FilterController {
     if (this._statsClickHandler) {
       this._filterComponent.setStatsClickHandler(() => {
         this._statsClickHandler();
-        this._mode = `stats`;
+        this._mode = PageMode.STATS;
       });
     }
 
@@ -51,9 +51,9 @@ export default class FilterController {
   }
 
   _onFilterChange(filterType) {
-    if (this._mode === `stats`) {
+    if (this._mode === PageMode.STATS) {
       this._statsBlurHandler();
-      this._mode = `page`;
+      this._mode = PageMode.PAGE;
     }
 
     this._moviesModel.setFilter(filterType);
@@ -68,7 +68,7 @@ export default class FilterController {
     this._statsClickHandler = handler;
     this._filterComponent.setStatsClickHandler(() => {
       this._statsClickHandler();
-      this._mode = `stats`;
+      this._mode = PageMode.STATS;
     });
   }
 }

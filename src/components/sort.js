@@ -1,13 +1,23 @@
-import AbstractComponent from './abstract-component';
+import AbstractComponent from './abstract-smart-component';
 import {SortType} from '../utils/sort';
 
-const createSortTemplate = () => (
-  `<ul class="sort">
-    <li><a href="#" data-sort-type="${SortType.DEFAULT}" class="sort__button sort__button--active">Sort by default</a></li>
-    <li><a href="#" data-sort-type="${SortType.DATE}" class="sort__button">Sort by date</a></li>
-    <li><a href="#" data-sort-type="${SortType.RATING}" class="sort__button">Sort by rating</a></li>
-  </ul>`
-);
+const createSortTemplate = (currentSortType) => {
+  const sortOptionsMarkup = [SortType.DEFAULT, SortType.DATE, SortType.RATING].map((type) => (
+    `<li>
+      <a
+        href="#" data-sort-type="${type}"
+        class="sort__button ${type === currentSortType ? `sort__button--active` : ``}"
+      >
+        Sort by ${type}
+      </a>
+    </li>`
+  )).join(``);
+  return (
+    `<ul class="sort">
+      ${sortOptionsMarkup}
+    </ul>`
+  );
+};
 
 export default class Sort extends AbstractComponent {
   constructor() {
@@ -17,11 +27,25 @@ export default class Sort extends AbstractComponent {
   }
 
   getTemplate() {
-    return createSortTemplate();
+    return createSortTemplate(this._currentSortType);
   }
 
   getSortType() {
     return this._currentSortType;
+  }
+
+  changeSortType(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._currentSortType = sortType;
+
+    this.getElement().querySelector(`.sort__button--active`).classList.remove(`sort__button--active`);
+
+    const currentSortTypeButton = [...this.getElement().querySelectorAll(`.sort__button`)]
+      .find((button) => button.dataset.sortType === sortType);
+    currentSortTypeButton.classList.add(`sort__button--active`);
   }
 
   setSortTypeChangeHandler(handler) {
@@ -32,17 +56,7 @@ export default class Sort extends AbstractComponent {
         return;
       }
 
-      const sortType = evt.target.dataset.sortType;
-
-      if (this._currentSortType === sortType) {
-        return;
-      }
-
-      this._currentSortType = sortType;
-
-      this.getElement().querySelector(`.sort__button--active`).classList.remove(`sort__button--active`);
-      evt.target.classList.add(`sort__button--active`);
-
+      this.changeSortType(evt.target.dataset.sortType);
       handler(this._currentSortType);
     });
   }

@@ -3,13 +3,10 @@ import MovieDetailsComponent from '../components/movie-details';
 import MovieModel from './../models/movie';
 import {render, replace, remove} from '../utils/render';
 import {KeyCode} from '../utils/common';
+import {MovieMode} from '../utils/page';
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
-
-const Mode = {
-  DEFAULT: `default`,
-  DETAILS: `details`,
-};
+const SECOND_TIMEOUT = 1000;
 
 export default class MovieController {
   constructor(
@@ -27,7 +24,7 @@ export default class MovieController {
     this._onCommentDelete = onCommentDelete;
     this._onCommentAdd = onCommentAdd;
 
-    this._mode = Mode.DEFAULT;
+    this._mode = MovieMode.DEFAULT;
 
     this._movieCardComponent = null;
     this._movieDetailsComponent = null;
@@ -60,7 +57,7 @@ export default class MovieController {
   }
 
   setDefaultView() {
-    if (this._mode !== Mode.DEFAULT) {
+    if (this._mode !== MovieMode.DEFAULT) {
       this._closeDetails();
     }
   }
@@ -73,8 +70,8 @@ export default class MovieController {
   }
 
   shake() {
-    this._movieCardComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-    this._movieDetailsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._movieCardComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / SECOND_TIMEOUT}s`;
+    this._movieDetailsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / SECOND_TIMEOUT}s`;
 
     setTimeout(() => {
       this._movieCardComponent.getElement().style.animation = ``;
@@ -91,14 +88,14 @@ export default class MovieController {
     this._subscribeOnPopupEvents(movie);
     document.addEventListener(`keydown`, this._onEscKeyDown);
     document.addEventListener(`keydown`, this._onCommentFormSubmit);
-    this._mode = Mode.DETAILS;
+    this._mode = MovieMode.DETAILS;
   }
 
   _closeDetails() {
     remove(this._movieDetailsComponent);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     document.removeEventListener(`keydown`, this._onCommentFormSubmit);
-    this._mode = Mode.DEFAULT;
+    this._mode = MovieMode.DEFAULT;
   }
 
   _onEscKeyDown(evt) {
@@ -177,7 +174,7 @@ export default class MovieController {
   }
 
   _onCommentFormSubmit(evt) {
-    if (evt.ctrlKey && evt.keyCode === KeyCode.ENTER_KEY) {
+    if ((evt.ctrlKey || evt.metaKey) && evt.keyCode === KeyCode.ENTER_KEY) {
       const {formElements, comment, movie} = this._movieDetailsComponent.getData();
 
       if (Object.values(comment).some((prop) => !prop)) {

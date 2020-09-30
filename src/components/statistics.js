@@ -5,17 +5,23 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getUserRank} from '../utils/user';
 
 const BAR_HEIGHT = 50;
-const PERIODS = [`All time`, `Today`, `Week`, `Month`, `Year`];
+const Period = {
+  ALL_TIME: `All time`,
+  TODAY: `Today`,
+  WEEK: `Week`,
+  MONTH: `Month`,
+  YEAR: `Year`
+};
 
 const getInitialDateByPeriod = (period) => {
   switch (period) {
-    case `today`:
+    case Period.TODAY.toLowerCase():
       return moment().startOf(`day`);
-    case `week`:
+    case Period.WEEK.toLowerCase():
       return moment().startOf(`week`);
-    case `month`:
+    case Period.MONTH.toLowerCase():
       return moment().startOf(`month`);
-    case `year`:
+    case Period.YEAR.toLowerCase():
       return moment().startOf(`year`);
     default:
       return null;
@@ -47,7 +53,7 @@ const getTotalRuntime = (movies) => {
 };
 
 const createPeriodsMarkup = (currentPeriod) => {
-  return PERIODS.map((it) => {
+  return Object.values(Period).map((it) => {
     const name = it.toLowerCase().replace(/\s/, `-`);
     return (
       `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${name}" value="${name}" ${name === currentPeriod ? `checked` : ``}>
@@ -184,7 +190,7 @@ export default class Statistics extends AbstractSmartComponent {
 
     this._movies = movies;
     this._shownMovies = movies;
-    this._period = `all-time`;
+    this._period = Period.ALL_TIME;
 
 
     this._chart = null;
