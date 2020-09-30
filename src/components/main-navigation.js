@@ -1,4 +1,5 @@
 import AbstractComponent from './abstract-component';
+import {PageMode} from '../utils/page';
 
 const createFilterMarkup = (filter, isActive) => {
   const {name, count} = filter;
@@ -16,7 +17,7 @@ const createMainNavigationTemplate = (filters, mode) => {
       <div class="main-navigation__items">
         ${filtersMarkup}
       </div>
-      <a href="${mode === `page` ? `#stats` : `#`}" class="main-navigation__additional ${mode === `stats` ? `main-navigation__additional--active` : ``}">Stats</a>
+      <a href="${mode === PageMode.PAGE ? `#stats` : `#`}" class="main-navigation__additional ${mode === PageMode.STATS ? `main-navigation__additional--active` : ``}">Stats</a>
     </nav>`
   );
 };
@@ -38,11 +39,18 @@ export default class MainNavigation extends AbstractComponent {
       const target = evt.target;
 
       if ((target.tagName !== `A` && target.tagName !== `SPAN`) ||
-        target.classList.contains(`main-navigation__item--active`) ||
-        target.parentElement.classList.contains(`main-navigation__item--active`) ||
         target.classList.contains(`main-navigation__additional`)
       ) {
         return;
+      }
+
+      if (this._mode === PageMode.PAGE) {
+        if (
+          target.classList.contains(`main-navigation__item--active`) ||
+          target.parentElement.classList.contains(`main-navigation__item--active`)
+        ) {
+          return;
+        }
       }
 
       if (this.getElement().querySelector(`.main-navigation__additional--active`)) {
@@ -66,6 +74,7 @@ export default class MainNavigation extends AbstractComponent {
     additionalElement.addEventListener(`click`, (evt) => {
       evt.preventDefault();
       additionalElement.classList.add(`main-navigation__additional--active`);
+      this._mode = PageMode.STATS;
       handler();
     });
   }

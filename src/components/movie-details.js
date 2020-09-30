@@ -14,7 +14,7 @@ const createCommentsMarkup = (comments) => {
   return comments.map((comment) => {
     const {id, author, emotion, date} = comment;
     const text = comment.comment;
-    const formattedDate = moment(date).format(`YYYY/MM/DD hh:mm`);
+    const formattedDate = moment(date).fromNow();
     return (
       `<li class="film-details__comment" data-comment-id="${id}">
         <span class="film-details__comment-emoji">
@@ -121,22 +121,22 @@ const createMovieDetailsTemplate = (movie, options = {}) => {
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
               <img class="film-details__poster-img" src="./${poster}" alt="">
-              <p class="film-details__age">${ageLimit}+</p>
+              <p class="film-details__age">${ageLimit || `0`}+</p>
             </div>
             <div class="film-details__info">
               <div class="film-details__info-head">
                 <div class="film-details__title-wrap">
-                  <h3 class="film-details__title">${name}</h3>
-                  <p class="film-details__title-original">Original: ${alternativeName}</p>
+                  <h3 class="film-details__title">${name || ``}</h3>
+                  <p class="film-details__title-original">Original: ${alternativeName || ``}</p>
                 </div>
                 <div class="film-details__rating">
-                  <p class="film-details__total-rating">${rating}</p>
+                  <p class="film-details__total-rating">${rating || ``}</p>
                 </div>
               </div>
               <table class="film-details__table">
                 <tr class="film-details__row">
                   <td class="film-details__term">Director</td>
-                  <td class="film-details__cell">${director}</td>
+                  <td class="film-details__cell">${director || ``}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Writers</td>
@@ -156,7 +156,7 @@ const createMovieDetailsTemplate = (movie, options = {}) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
-                  <td class="film-details__cell">${country}</td>
+                  <td class="film-details__cell">${country || ``}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">${genresTitle}</td>
